@@ -1,0 +1,112 @@
+
+#ANDRES FELIPE FLOREZ GUERRERO
+class Producto:
+    def __init__(self, nombre, precio, cantidad):
+        self.nombre = nombre
+        self.precio = precio
+        self.cantidad = cantidad
+
+    def actualizar_inventario(self, cantidad):
+        self.cantidad += cantidad
+
+    def vender(self, cantidad):
+        if cantidad > self.cantidad:
+            return False
+        self.cantidad -= cantidad
+        return True
+
+def calcular_total(subtotal):
+    if subtotal > 100000:
+        subtotal *= 0.9  # Descuento del 10%
+    return subtotal
+
+def calcular_total_final(subtotal, metodo_pago):
+    subtotal = calcular_total(subtotal)
+    if subtotal > 150000:
+        if metodo_pago == 'efectivo':
+            subtotal *= 0.95  # Descuento del 5%
+        elif metodo_pago == 'tarjeta':
+            subtotal *= 1.03  # Recargo del 3%
+    return subtotal
+
+def calcular_salario(horas_trabajadas, pago_por_hora):
+    horas_extras = max(0, horas_trabajadas - 160)  # 40 horas a la semana
+    salario_base = horas_trabajadas * pago_por_hora
+    salario_extras = horas_extras * pago_por_hora * 1.5
+    return salario_base + salario_extras
+
+def generar_reporte(productos, total_ventas, salarios):
+    print("\n--- Reporte de Ventas ---")
+    print("Inventario actual:")
+    for producto in productos:
+        print(f"{producto.nombre}: {producto.cantidad} unidades")
+    print(f"Total de ventas del día: {total_ventas} COP")
+    print("Salarios a pagar a los empleados:")
+    for empleado, salario in salarios.items():
+        print(f"{empleado}: {salario} COP")
+
+def main():
+    # Inicialización de productos
+    producto1 = Producto("Producto A", 50000, 100)
+    producto2 = Producto("Producto B", 70000, 50)
+    productos = [producto1, producto2]
+
+    # Inicialización de empleados
+    horas_trabajadas = {"Empleado 1": 0, "Empleado 2": 0}
+    pago_por_hora = 10000
+    total_ventas = 0
+
+    while True:
+        print("\n WELCOME TO ANDRE´S STORE")
+        print("1. Registrar venta")
+        print("2. Actualizar inventario")
+        print("3. Registrar horas de trabajo")
+        print("4. Generar reporte diario")
+        print("5. Salir")
+        opcion = input("Seleccione una opción: ")
+
+        if opcion == '1':
+            print("Productos disponibles:")
+            for i, producto in enumerate(productos):
+                print(f"{i + 1}. {producto.nombre} - Precio: {producto.precio} COP - Stock: {producto.cantidad}")
+
+            seleccion = int(input("Seleccione el producto (1 o 2): ")) - 1
+            cantidad = int(input("Cantidad a vender: "))
+
+            if productos[seleccion].vender(cantidad):
+                subtotal = productos[seleccion].precio * cantidad
+                total_ventas += subtotal
+                metodo_pago = input("Método de pago (efectivo/tarjeta): ").strip().lower()
+                total_final = calcular_total_final(subtotal, metodo_pago)
+                print(f"Total a pagar: {total_final} COP")
+            else:
+                print("Inventario insuficiente.")
+
+        elif opcion == '2':
+            print("Productos disponibles:")
+            for i, producto in enumerate(productos):
+                print(f"{i + 1}. {producto.nombre} - Stock: {producto.cantidad}")
+
+            seleccion = int(input("Seleccione el producto a actualizar (1 o 2): ")) - 1
+            cantidad = int(input("Cantidad a agregar: "))
+            productos[seleccion].actualizar_inventario(cantidad)
+            print(f"Inventario actualizado: {productos[seleccion].nombre} - Stock: {productos[seleccion].cantidad}")
+
+        elif opcion == '3':
+            for empleado in horas_trabajadas.keys():
+                horas = int(input(f"Ingrese horas trabajadas para {empleado}: "))
+                horas_trabajadas[empleado] += horas
+
+        elif opcion == '4':
+            salarios = {empleado: calcular_salario(horas, pago_por_hora) for empleado, horas in horas_trabajadas.items()}
+            generar_reporte(productos, total_ventas, salarios)
+
+        elif opcion == '5':
+            print("Saliendo del sistema.")
+            break
+
+        else:
+            print("Opción no válida, por favor intente nuevamente.")
+
+if __name__ == "__main__":
+    main()
